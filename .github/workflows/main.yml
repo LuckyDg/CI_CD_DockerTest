@@ -23,7 +23,8 @@ jobs:
       run: sudo apt-get install postgresql-client
 
     - name: Configurar productos DB
-      run: cat productos_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h localhost -U postgres
+      run: cat productos_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h postgres -U postgres
 
     - name: Configurar productos_auth DB
-      run: cat productos_auth_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h localhost -U postgres
+      run: cat productos_auth_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h postgres -U postgres
+
