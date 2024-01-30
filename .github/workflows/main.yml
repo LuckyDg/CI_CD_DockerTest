@@ -22,9 +22,8 @@ jobs:
 
     - name: Create productos_auth Database if not exists
       run: |
-        PGPASSWORD=password psql -h localhost -U user -d postgres -c "SELECT 'CREATE DATABASE productos_auth' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'productos_auth')\gexec"
+        PGPASSWORD=password psql -h localhost -U user -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'productos_auth'" | grep -q 1 || PGPASSWORD=password psql -h localhost -U user -d postgres -c "CREATE DATABASE productos_auth"
 
     - name: Execute SQL script for productos_auth
       run: |
         PGPASSWORD=password psql -h localhost -U user -d productos_auth -f productos_auth_init.sql
-
