@@ -1,35 +1,29 @@
-name: PostgreSQL CI
+name: Setup PostgreSQL
 
-on:
-  push:
-    branches: [ main ]
+on: [push]
 
 jobs:
   setup-db:
     runs-on: ubuntu-latest
-
     services:
       postgres:
-        image: postgres:12
+        image: postgres:latest
         env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Instalar PostgreSQL client
+    - name: Install PostgreSQL client
       run: sudo apt-get install postgresql-client
 
-    - name: Esperar a que PostgreSQL esté listo
-      run: sleep 30
+    - name: Execute SQL script for productos_auth
+      run: |
+        PGPASSWORD=password psql -h localhost -U user -d postgres -f productos_auth_init.sql
 
-    - name: Verificar conexión a PostgreSQL
-      run: PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h postgres -U postgres -c "SELECT version();"
-
-    - name: Configurar productos DB
-      run: cat productos_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h postgres -U postgres
-
-    - name: Configurar productos_auth DB
-      run: cat productos_auth_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h postgres -U postgres
+    - name: Execute SQL script for productos
+      run: |
+        PGPASSWORD=password psql -h localhost -U user -d postgres -f productos_init.sql
