@@ -1,0 +1,34 @@
+name: PostgreSQL CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  setup-db:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Instalar PostgreSQL client
+      run: sudo apt-get install postgresql-client
+
+    - name: Configurar productos DB
+      run: cat productos_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h localhost -U postgres
+
+    - name: Configurar productos_auth DB
+      run: cat productos_auth_init.sql | PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -h localhost -U postgres
